@@ -1,0 +1,21 @@
+html,
+body,
+#ops-app {
+  margin: 0;
+  min-height: 100%;
+  background: #f4f5f7;
+  color: #1f2329;
+  font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', 'Segoe UI', Roboto,
+    'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+}

@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, viewport-fit=cover, user-scalable=no"
+    />
+    <meta name="format-detection" content="telephone=no, email=no" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>App H5</title>
+    <style>
+      html,
+      body,
+      #app {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-height: 100%;
+        background: #fff;
+      }
+      #app-boot {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #fff;
+        z-index: 9999;
+        transition: opacity 0.2s ease;
+      }
+      #app-boot.is-hide {
+        opacity: 0;
+        pointer-events: none;
+      }
+      .boot-spinner {
+        width: 28px;
+        height: 28px;
+        border: 2px solid #eee;
+        border-top-color: #eab89d;
+        border-radius: 50%;
+        animation: boot-spin 0.7s linear infinite;
+      }
+      @keyframes boot-spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
+    <script>
+      ;(function () {
+        var docEl = document.documentElement
+        function setRem() {
+          var width = docEl.clientWidth || 375
+          if (width > 540) width = 540
+          docEl.style.fontSize = width / 10 + 'px'
+        }
+        setRem()
+        window.addEventListener('resize', setRem)
+        window.addEventListener('pageshow', function (e) {
+          if (e.persisted) setRem()
+        })
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="app-boot"><div class="boot-spinner"></div></div>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

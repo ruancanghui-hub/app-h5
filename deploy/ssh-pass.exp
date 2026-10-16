@@ -1,0 +1,58 @@
+#!/usr/bin/expect -f
+# SSH 密码登录封装（本机无 sshpass）
+#
+# 用法:
+#   SSH_PW='password' expect ssh-pass.exp <host> <command>
+#
+# 环境变量:
+#   SSH_PW    必填，登录密码
+#   SSH_USER  可选，默认 root
+#   SSH_BIND  可选，绑定本机源地址。当本机开着 TUN 模式代理（如 Clash）时，
+#             到目标服务器的流量会被代理劫持导致 SSH 被掐断
+#             （kex_exchange_identification: Connection closed by remote host）。
+#             绑定物理网卡地址即可绕过，例如 SSH_BIND=$(ipconfig getifaddr en1)
+
+set timeout 300
+log_user 1
+
+if {![info exists env(SSH_PW)]} {
+    puts stderr "ERROR: 缺少环境变量 SSH_PW"
+    exit 1
+}
+set pw      $env(SSH_PW)
+set host    [lindex $argv 0]
+set unit    [lindex $argv 1]
+set user    [expr {[info exists env(SSH_USER)] ? $env(SSH_USER) : "root"}]
+set bind    [expr {[info exists env(SSH_BIND)] ? $env(SSH_BIND) : ""}]
+
+if {$host eq "" || $unit eq ""} {
+    puts stderr "用法: SSH_PW='...' expect ssh-pass.exp <host> <command>"
+    exit 1
+}
+
+if {$bind ne ""} {
+    spawn ssh -o BindAddress=$bind \
+              -o StrictHostKeyChecking=accept-new \
+              -o ConnectTimeout=20 \
+              -o ServerAliveInterval=15 \
+              -o PubkeyAuthentication=no \
+              -o PreferredAuthentications=password,keyboard-interactive \
+              $user@$host $unit
+} else {
+    spawn ssh -o StrictHostKeyChecking=accept-new \
+              -o ConnectTimeout=20 \
+              -o ServerAliveInterval=15 \
+              -o PubkeyAuthentication=no \
+              -o PreferredAuthentications=password,keyboard-interactive \
+              $user@$host $unit
+}
+
+expect {
+    -re "(?i)are you sure you want to continue connecting" { send "yes\r"; exp_continue }
+    -re "(?i)password:"                                    { send "$pw\r"; exp_continue }
+    -re "(?i)permission denied"                            { puts stderr "\n[AUTH_FAILED] 密码被拒绝"; exit 5 }
+    eof
+}
+
+catch wait result
+exit [lindex $result 3]
