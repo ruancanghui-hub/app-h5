@@ -1,0 +1,22 @@
+{
+  "apps": [
+    {
+      "name": "app-h5-api",
+      "script": "/www/wwwroot/h5.aigrowpark.com-api/app.cjs",
+      "cwd": "/www/wwwroot/h5.aigrowpark.com-api",
+      "instances": 1,
+      "exec_mode": "fork",
+      "autorestart": true,
+      "max_memory_restart": "200M",
+      "merge_logs": true,
+      "out_file": "/www/wwwroot/h5.aigrowpark.com-api/logs/out.log",
+      "error_file": "/www/wwwroot/h5.aigrowpark.com-api/logs/error.log",
+      "env": {
+        "NODE_ENV": "production",
+        "PORT": "3900",
+        "HOST": "127.0.0.1",
+        "DATA_DIR": "/www/wwwroot/h5.aigrowpark.com-api/data"
+      }
+    }
+  ]
+}

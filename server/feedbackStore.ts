@@ -15,7 +15,9 @@ export interface StoredFeedback {
   createdAt: string
 }
 
-const DATA_DIR = path.resolve(process.cwd(), 'data')
+const DATA_DIR = process.env.DATA_DIR
+  ? path.resolve(process.env.DATA_DIR)
+  : path.resolve(process.cwd(), 'data')
 const UPLOAD_DIR = path.join(DATA_DIR, 'uploads')
 const STORE_FILE = path.join(DATA_DIR, 'feedbacks.json')
 const TYPE_SET = new Set<ProblemType>(['abnormal', 'suggestion', 'other'])
