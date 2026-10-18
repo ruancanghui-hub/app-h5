@@ -22,6 +22,18 @@ const SEED: PublicClient[] = [
     appleAudiences: [],
     googleAudiences: [],
   },
+  {
+    clientId: 'cvnivo',
+    name: 'CVNivo',
+    bundleIds: ['com.nightelf.cvnivo', 'com.nightelf.cvnivo.dev'],
+    redirectUris: [
+      'cvnivo://auth/callback',
+      'http://localhost:5173/#/auth/done',
+      'https://h5.aigrowpark.com/#/auth/done',
+    ],
+    appleAudiences: [],
+    googleAudiences: [],
+  },
 ]
 
 function clientsFile() {
@@ -44,11 +56,21 @@ export function listClients(): PublicClient[] {
   if (!fs.existsSync(file)) {
     fs.mkdirSync(path.dirname(file), { recursive: true })
     fs.writeFileSync(file, JSON.stringify(SEED, null, 2), 'utf8')
+    return structuredClone(SEED)
   }
   try {
     const parsed = JSON.parse(fs.readFileSync(file, 'utf8')) as Partial<PublicClient>[]
     if (!Array.isArray(parsed)) return structuredClone(SEED)
-    return parsed.map(normalize).filter((c) => c.clientId)
+    const list = parsed.map(normalize).filter((c) => c.clientId)
+    let dirty = false
+    for (const seed of SEED) {
+      if (!list.some((c) => c.clientId === seed.clientId)) {
+        list.push(structuredClone(seed))
+        dirty = true
+      }
+    }
+    if (dirty) fs.writeFileSync(file, JSON.stringify(list, null, 2), 'utf8')
+    return list
   } catch {
     return structuredClone(SEED)
   }

@@ -28,7 +28,7 @@ pnpm dev
 
 ### 接入应用（一期静态名单）
 
-见 `server/identity/clients.ts`。预置 `app-h5-preview`、`demo-app`。流程：登录/注册 → 授权确认 → PKCE 换票 → `Bridge.setAuth`。
+见 `server/identity/clients.ts`。预置 `app-h5-preview`、`demo-app`、`cvnivo`（Bundle `com.nightelf.cvnivo`）。流程：登录/注册 → 授权确认 → PKCE 换票 → `Bridge.setAuth`（或原生换票）。CVNivo 工程联调见该仓库 `docs/IDENTITY-LINK.md`。
 
 ## 构建
 

@@ -12,3 +12,4 @@
 - **接入应用 → Identity**: 经授权确认产生 AppMembership；默认获得基础资料；Identity 全局唯一
 - **Identity ⟷ 邮箱/社交凭证**: 同明文邮箱自动合并为同一 Identity；Apple 隐藏邮箱需显式绑定
 - **问题反馈 → Identity**: 已登录提交时绑定 `identity_id`；匿名提交不绑定
+- **CVNivo → Identity**: Flutter `client_id=cvnivo` 走共享登录；CVNivo API 用 Identity access token 换求职者账户 JWT（见 CVNivo `docs/IDENTITY-LINK.md`）
