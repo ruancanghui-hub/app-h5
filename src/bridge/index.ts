@@ -1,4 +1,6 @@
-import type { AppBridge, BridgeAuth, BridgeImageResult } from './types'
+import type { AppBridge, BridgeAuth, BridgeImageResult, BridgeSetAuthPayload } from './types'
+
+const PREVIEW_AUTH_KEY = 'app-h5-preview-auth'
 
 declare global {
   interface Window {
@@ -54,7 +56,6 @@ async function openHistory(): Promise<void> {
     return
   }
   if (callNative('openHistory')) return
-  // fallback handled by caller via router
   throw new Error('BRIDGE_OPEN_HISTORY_FALLBACK')
 }
 
@@ -96,6 +97,16 @@ async function pickImage(options?: { maxCount?: number }): Promise<BridgeImageRe
   return pickFromFileInput(maxCount)
 }
 
+function readPreviewAuth(): BridgeAuth | null {
+  try {
+    const raw = sessionStorage.getItem(PREVIEW_AUTH_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as BridgeAuth
+  } catch {
+    return null
+  }
+}
+
 async function getAuth(): Promise<BridgeAuth | null> {
   if (window.__APP_BRIDGE__?.getAuth) {
     return window.__APP_BRIDGE__.getAuth()
@@ -106,7 +117,32 @@ async function getAuth(): Promise<BridgeAuth | null> {
   if (callNative('getAuth')) {
     return null
   }
+  const preview = readPreviewAuth()
+  if (preview) return preview
   return { token: 'mock-token', userId: 'preview-user' }
+}
+
+async function setAuth(payload: BridgeSetAuthPayload): Promise<void> {
+  if (window.__APP_BRIDGE__?.setAuth) {
+    await window.__APP_BRIDGE__.setAuth(payload)
+    return
+  }
+  if (window.Native?.setAuth) {
+    await window.Native.setAuth(payload)
+    return
+  }
+  if (callNative('setAuth', payload)) return
+
+  // 浏览器预览：sessionStorage 模拟原生保管（非正式主会话）
+  const auth: BridgeAuth = {
+    token: payload.accessToken,
+    userId: payload.identityId,
+    identityId: payload.identityId,
+    refreshToken: payload.refreshToken,
+    expiresAt: payload.expiresAt,
+  }
+  sessionStorage.setItem(PREVIEW_AUTH_KEY, JSON.stringify(auth))
+  console.info('[Bridge] setAuth: preview session stored')
 }
 
 export const bridge: AppBridge = {
@@ -114,6 +150,7 @@ export const bridge: AppBridge = {
   openHistory,
   pickImage,
   getAuth,
+  setAuth,
 }
 
-export type { AppBridge, BridgeAuth, BridgeImageResult }
+export type { AppBridge, BridgeAuth, BridgeImageResult, BridgeSetAuthPayload }

@@ -15,7 +15,26 @@
         "NODE_ENV": "production",
         "PORT": "3900",
         "HOST": "127.0.0.1",
-        "DATA_DIR": "/www/wwwroot/h5.aigrowpark.com-api/data"
+        "DATA_DIR": "/www/wwwroot/h5.aigrowpark.com-api/data",
+        "IDENTITY_DATA_DIR": "/www/wwwroot/h5.aigrowpark.com-api/data/identity"
+      }
+    },
+    {
+      "name": "app-h5-identity",
+      "script": "/www/wwwroot/h5.aigrowpark.com-api/identity.cjs",
+      "cwd": "/www/wwwroot/h5.aigrowpark.com-api",
+      "instances": 1,
+      "exec_mode": "fork",
+      "autorestart": true,
+      "max_memory_restart": "200M",
+      "merge_logs": true,
+      "out_file": "/www/wwwroot/h5.aigrowpark.com-api/logs/identity-out.log",
+      "error_file": "/www/wwwroot/h5.aigrowpark.com-api/logs/identity-error.log",
+      "env": {
+        "NODE_ENV": "production",
+        "IDENTITY_PORT": "3901",
+        "IDENTITY_HOST": "127.0.0.1",
+        "IDENTITY_DATA_DIR": "/www/wwwroot/h5.aigrowpark.com-api/data/identity"
       }
     }
   ]

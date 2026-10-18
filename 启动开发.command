@@ -80,20 +80,28 @@ if [[ -z "$BASE" ]]; then
 fi
 
 CLIENT_URL="${BASE}/#/feedback"
+LOGIN_URL="${BASE}/#/auth/login?client_id=app-h5-preview"
 OPS_URL="${BASE}/admin.html"
+IDENTITY_OPS_URL="${BASE}/identity-admin.html"
 
 echo ""
 echo "服务已就绪: $BASE"
-echo "客户端:   $CLIENT_URL"
-echo "运营后台: $OPS_URL"
+echo "意见与建议: $CLIENT_URL"
+echo "托管登录:   $LOGIN_URL"
+echo "反馈后台:   $OPS_URL"
+echo "接入登记:   $IDENTITY_OPS_URL"
 echo ""
 echo "正在打开浏览器（关闭本窗口将停止开发服务）..."
 echo "----------------------------------------"
 tail -n +1 -f "$LOG" &
 TAIL_PID=$!
 
+open "$LOGIN_URL"
+sleep 0.2
 open "$CLIENT_URL"
-sleep 0.3
+sleep 0.2
+open "$IDENTITY_OPS_URL"
+sleep 0.2
 open "$OPS_URL"
 
 set +e

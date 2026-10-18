@@ -3,9 +3,10 @@ import vue from '@vitejs/plugin-vue'
 import { fileURLToPath, URL } from 'node:url'
 import postcssPxToRem from 'postcss-pxtorem'
 import { feedbackApiPlugin } from './server/feedbackApiPlugin'
+import { identityApiPlugin } from './server/identity/identityApiPlugin'
 
 export default defineConfig({
-  plugins: [vue(), feedbackApiPlugin()],
+  plugins: [vue(), feedbackApiPlugin(), identityApiPlugin()],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -33,6 +34,7 @@ export default defineConfig({
       input: {
         index: fileURLToPath(new URL('./index.html', import.meta.url)),
         admin: fileURLToPath(new URL('./admin.html', import.meta.url)),
+        identityAdmin: fileURLToPath(new URL('./identity-admin.html', import.meta.url)),
       },
       output: {
         manualChunks: {

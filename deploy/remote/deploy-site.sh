@@ -58,28 +58,30 @@ rsync -a --delete --exclude '.well-known' "$SRC"/ "$SITE"/
 echo "    已同步到 $SITE"
 find "$SITE" -maxdepth 1 -type f | sed 's/^/      /'
 
-echo "--- 3. 部署 API 后端 ---"
-mkdir -p "$API_DIR/data/uploads" "$API_DIR/logs"
+echo "--- 3. 部署 API 后端（反馈 + 身份）---"
+mkdir -p "$API_DIR/data/uploads" "$API_DIR/data/identity" "$API_DIR/logs"
 cp -f "$WORK/prod-server.cjs" "$API_DIR/app.cjs"
+cp -f "$WORK/identity-server.cjs" "$API_DIR/identity.cjs"
 cp -f "$WORK/api-ecosystem.json" "$API_DIR/ecosystem.json"
 cd "$API_DIR"
-if pm2 describe app-h5-api >/dev/null 2>&1; then
-  pm2 reload ecosystem.json --update-env >/dev/null
-  echo "    已 reload app-h5-api"
-else
-  pm2 start ecosystem.json >/dev/null
-  echo "    已启动 app-h5-api"
-fi
+# startOrReload：已有则 reload，新增的 identity 进程会一并拉起
+pm2 startOrReload ecosystem.json --update-env >/dev/null
+echo "    已 startOrReload ecosystem（app-h5-api / app-h5-identity）"
 pm2 save >/dev/null
 sleep 2
 pm2 describe app-h5-api 2>/dev/null | grep -E "status|script path|exec cwd" | sed 's/^/      /' || true
+pm2 describe app-h5-identity 2>/dev/null | grep -E "status|script path|exec cwd" | sed 's/^/      /' || true
 
 echo "--- 4. 服务端验证 ---"
-echo -n "    /api/health      → "
+echo -n "    /api/health           → "
 curl -s --max-time 8 http://127.0.0.1:3900/api/health; echo
-echo -n "    admin.html       → "
+echo -n "    /api/identity/health  → "
+curl -s --max-time 8 http://127.0.0.1:3901/api/identity/health; echo
+echo -n "    admin.html            → "
 [ -f "$SITE/admin.html" ] && echo "✔ 存在" || echo "✘ 缺失"
-echo -n "    3900 端口监听     → "
+echo -n "    3900 端口监听          → "
 ss -lnt 2>/dev/null | grep ":3900 " || echo "未监听"
+echo -n "    3901 端口监听          → "
+ss -lnt 2>/dev/null | grep ":3901 " || echo "未监听"
 
 echo "--- 完成 ---"

@@ -44,6 +44,8 @@ ESB=$(ls -d node_modules/.pnpm/@esbuild+darwin-*/node_modules/@esbuild/darwin-*/
 mkdir -p deploy/out
 "$ESB" server/prod-server.ts --bundle --platform=node --target=node20 \
   --format=cjs --outfile=deploy/out/prod-server.cjs
+"$ESB" server/identity/identity-server.ts --bundle --platform=node --target=node20 \
+  --format=cjs --outfile=deploy/out/identity-server.cjs
 
 echo ""
 echo "=========== 3. 上传产物 ==========="
@@ -51,6 +53,7 @@ echo "  发布标记: $STAMP"
 ssh_run "mkdir -p $WORK"
 scp_up "$PROJ/dist" "$WORK/dist-$STAMP"
 scp_up "$DEPLOY/out/prod-server.cjs" "$WORK/"
+scp_up "$DEPLOY/out/identity-server.cjs" "$WORK/"
 scp_up "$DEPLOY/remote/api-ecosystem.json" "$WORK/"
 scp_up "$DEPLOY/remote/deploy-site.sh" "$WORK/"
 

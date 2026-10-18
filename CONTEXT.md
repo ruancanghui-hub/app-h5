@@ -1,6 +1,6 @@
 # App H5
 
-App 内 WebView 承载的业务 H5 上下文：以容器页形式提供功能，并通过 Bridge 与原生协作。
+App 内 WebView 承载的业务 H5 上下文：以容器页形式提供功能，并通过 Bridge 与原生协作。多上下文见 [CONTEXT-MAP.md](./CONTEXT-MAP.md)；身份相关术语在 [Identity](./identity/CONTEXT.md)。
 
 ## Language
 
@@ -9,7 +9,7 @@ App WebView 内打开的业务页面。
 _Avoid_: 小程序页, 原生页, 网页
 
 **问题反馈**:
-用户通过「意见与建议」提交的一次反馈实体。
+用户通过「意见与建议」提交的一次反馈实体；已登录时绑定 Identity，未登录仍可匿名提交（可选手动联系方式）。
 _Avoid_: 工单, 投诉, 建议单
 
 **问题类型**:

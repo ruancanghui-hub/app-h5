@@ -3,6 +3,7 @@ import path from 'node:path'
 import { randomUUID } from 'node:crypto'
 import Busboy from 'busboy'
 import type { IncomingMessage, ServerResponse } from 'node:http'
+import { resolveAccessToken } from './identity/service'
 
 export type ProblemType = 'abnormal' | 'suggestion' | 'other'
 
@@ -12,6 +13,8 @@ export interface StoredFeedback {
   content: string
   contact?: string
   images: string[]
+  /** 已登录提交时绑定；匿名提交为空 */
+  identityId?: string
   createdAt: string
 }
 
@@ -118,6 +121,14 @@ function extFromMime(mimeType: string, filename: string): string {
   return '.jpg'
 }
 
+function identityIdFromAuthHeader(req: IncomingMessage): string | undefined {
+  const h = req.headers.authorization
+  if (!h || !h.startsWith('Bearer ')) return undefined
+  const token = h.slice(7).trim()
+  if (!token || token === 'mock-token') return undefined
+  return resolveAccessToken(token)?.identity.id
+}
+
 export async function handleCreateFeedback(req: IncomingMessage, res: ServerResponse) {
   try {
     ensureDirs()
@@ -125,6 +136,7 @@ export async function handleCreateFeedback(req: IncomingMessage, res: ServerResp
     const problemType = (fields.problemType || '').trim() as ProblemType
     const content = (fields.content || '').trim()
     const contact = (fields.contact || '').trim()
+    const identityId = identityIdFromAuthHeader(req)
 
     if (!TYPE_SET.has(problemType)) {
       sendJson(res, 400, { message: '问题类型无效' })
@@ -152,6 +164,7 @@ export async function handleCreateFeedback(req: IncomingMessage, res: ServerResp
       content,
       contact: contact || undefined,
       images: imageUrls,
+      identityId,
       createdAt: new Date().toISOString(),
     }
 
